@@ -1,0 +1,41 @@
+Create the html directory for example.com as follows, using the -p flag to create any necessary parent directories:
+sudo mkdir -p /var/www/example.com/html
+
+Create an additional directory to store log files for the site:
+sudo mkdir -p /var/www/example.com/log
+
+Next, assign ownership of the html directory with the $USER environmental variable:
+sudo chown -R $USER:$USER /var/www/example.com/html
+
+Make sure that your web root has the default permissions set:
+sudo chmod -R 755 /var/www
+
+Next, create a sample index.html page using vi or your favorite editor:
+sudo vi /var/www/example.com/html/index.html
+
+Create both directories with the following command:
+sudo mkdir /etc/httpd/sites-available /etc/httpd/sites-enabled
+
+Add this line to the end of the file(/etc/httpd/conf/httpd.conf):
+IncludeOptional sites-enabled/*.conf
+
+Start by creating a new file in the sites-available directory:
+sudo vi /etc/httpd/sites-available/example.com.conf
+
+Add in the following configuration block, and change the example.com domain to your domain name:
+/etc/httpd/sites-available/example.com.conf
+<VirtualHost *:80>
+    ServerName www.example.com
+    ServerAlias example.com
+    DocumentRoot /var/www/example.com/html
+    ErrorLog /var/www/example.com/log/error.log
+    CustomLog /var/www/example.com/log/requests.log combined
+</VirtualHost>
+
+sudo ln -s /etc/httpd/sites-available/example.com.conf /etc/httpd/sites-enabled/example.com.conf
+
+Adjusting Apache Policies Universally
+Setting the Apache policy universally will tell SELinux to treat all Apache processes identically by using the httpd_unified boolean. While this approach is more convenient, it will not give you the same level of control as an approach that focuses on a file or directory policy.
+
+Run the following command to set a universal Apache policy:
+sudo setsebool -P httpd_unified 1
