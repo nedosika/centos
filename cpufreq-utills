@@ -1,0 +1,5 @@
+yum install epel-release
+yum install cpupowerutils
+
+cpupower frequency-info --governors
+cpupower frequency-set --governor [governor]
