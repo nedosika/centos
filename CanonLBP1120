@@ -1,0 +1,6 @@
+yum install cups
+yum localinstall [common file]
+yum localinstall [capt file]
+systemctl restart cups.service
+/usr/sbin/lpadmin -p LBP1120 -m CNCUPSLBP1120CAPTK.ppd -v ccp://localhost:59687 –E
+systemctl status ccpd.service
