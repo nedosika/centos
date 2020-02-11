@@ -4,3 +4,25 @@ yum localinstall [capt file]
 systemctl restart cups.service
 /usr/sbin/lpadmin -p LBP1120 -m CNCUPSLBP1120CAPTK.ppd -v ccp://localhost:59687 –E
 systemctl status ccpd.service
+
+In a LAN environment where IP addresses have been assigned, if the status of the printer cannot be displayed, the CUPS security settings must be changed. Add the set IP address to the following items in the cupsd.conf file (/etc/cups/cupsd.conf), and restart CUPS.
+<Location />
+<Location /admin>
+Example:
+:
+<Location />
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+Allow From XXX.XXX.XXX.  (Substitute the set IP address here.)
+</Location>
+:
+<Location /admin>
+:
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+Allow From XXX.XXX.XXX.XXX  (Substitute the set IP address here.)
+:
+</Location>
+For information about the security settings for networks, refer to the "CUPS Software Administrators Manual" at http://www.cups.org/doc-1.1/sam.html.
