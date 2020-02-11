@@ -4,3 +4,11 @@ sensors-detect
 yum install hddtemp
 yum install mc
 yum install wget
+
+#SMART status HDD
+Installation of Smartcl.
+# yum install smartmontools.
+# systemctl start smartd ; systemctl enable smartd
+
+Check Whether Smart Capability is enabled or not for the disk.
+# smartctl -i /dev/sda
