@@ -4,3 +4,7 @@
 3. sudo firewall-cmd --remove-service=ssh --permanent - disabling service(ssh)
 4. sudo firewall-cmd --add-service=http --permanent - open ports
 5. sudo firewall-cmd --reload - reloading firewall
+
+## Stop/Disable firewall
+systemctl disable firewalld
+systemctl stop firewalld
