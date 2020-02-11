@@ -5,7 +5,11 @@ systemctl restart cups.service
 /usr/sbin/lpadmin -p LBP1120 -m CNCUPSLBP1120CAPTK.ppd -v ccp://localhost:59687 –E
 systemctl status ccpd.service
 
-In a LAN environment where IP addresses have been assigned, if the status of the printer cannot be displayed, the CUPS security settings must be changed. Add the set IP address to the following items in the cupsd.conf file (/etc/cups/cupsd.conf), and restart CUPS.
+In a LAN environment where IP addresses have been assigned, if the status of the printer cannot be displayed, 
+the CUPS security settings must be changed. 
+Add the set IP address to the following items in the cupsd.conf file (/etc/cups/cupsd.conf), and restart CUPS.
+Listen *:631
+
 <Location />
 <Location /admin>
 Example:
