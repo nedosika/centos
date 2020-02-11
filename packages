@@ -1,5 +1,6 @@
 yum install lm_sensors
 sensors-detect
 
+yum install hddtemp
 yum install mc
 yum install wget
