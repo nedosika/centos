@@ -5,28 +5,85 @@ systemctl restart cups.service
 /usr/sbin/lpadmin -p LBP1120 -m CNCUPSLBP1120CAPTK.ppd -v ccp://localhost:59687 –E
 systemctl status ccpd.service
 
-In a LAN environment where IP addresses have been assigned, if the status of the printer cannot be displayed, 
-the CUPS security settings must be changed. 
-Add the set IP address to the following items in the cupsd.conf file (/etc/cups/cupsd.conf), and restart CUPS.
+cupsd.conf file (/etc/cups/cupsd.conf)
 Listen *:631
 
-<Location />
-<Location /admin>
-Example:
-:
-<Location />
-Order Deny,Allow
-Deny From All
-Allow From 127.0.0.1
-Allow From XXX.XXX.XXX.  (Substitute the set IP address here.)
-</Location>
-:
-<Location /admin>
-:
-Order Deny,Allow
-Deny From All
-Allow From 127.0.0.1
-Allow From XXX.XXX.XXX.XXX  (Substitute the set IP address here.)
-:
-</Location>
-For information about the security settings for networks, refer to the "CUPS Software Administrators Manual" at http://www.cups.org/doc-1.1/sam.html.
+Установка принтеров Canon LBP
+Ручная установка (для опытных пользователей)
+Пока не включаем принтер
+Скачиваем архив с драйверами Canon CAPT по ссылке https://www.canon.ru/support/consumer_products/products/printers/laser/i-sensys_lbp6000.html?type=drivers&language=ru&os=linux%20(64-bit)
+Распаковываем архив, открываем в терминале папку 32-bit_Driver/RPM/ либо 64-bit_Driver/RPM/ в соответствии с разрядностью Вашей системы и устанавливаем два RPM пакета:
+sudo urpmi *.rpm --auto
+Перезапускаем службу CUPS:
+sudo systemctl restart cups
+Регистрируем принтер в системе: Внимание! Вместо LBP2900 укажите свою модель принтера, а вместо CNCUPSLBP2900CAPTK.ppd укажите название ppd вашего принтера из ниже указанной таблицы:
+sudo lpadmin -p LBP2900 -m CNCUPSLBP2900CAPTK.ppd -v ccp://localhost:59687 -E
+sudo ccpdadmin -p LBP2900 -o /dev/usb/lp0
+Имя принтера	Имя файла PPD
+LBP9100C	CNCUPSLBP9100CCAPTK.ppd
+LBP7200C series	CNCUPSLBP7200CCAPTK.ppd
+LBP7200Cdn (network mode)	CNCUPSLBP7200CCAPTK.ppd
+LBP7018C / LBP7010C	CNCUPSLBP7018CCAPTK.ppd
+LBP6300	CNCUPSLBP6300CAPTK.ppd
+LBP6200	CNCUPSLBP6200CAPTK.ppd
+LBP6020	CNCUPSLBP6020CAPTK.ppd
+LBP6000 LBP6018	CNCUPSLBP6018CAPTK.ppd
+LBP5300	CNCUPSLBP5300CAPTK.ppd
+LBP5100	CNCUPSLBP5100CAPTK.ppd
+LBP5050 series	CNCUPSLBP5050CAPTK.ppd
+LBP5000	CNCUPSLBP5000CAPTK.ppd
+LBP3500	CNCUPSLBP3500CAPTK.ppd
+LBP3310	CNCUPSLBP3310CAPTK.ppd
+LBP3300	CNCUPSLBP3300CAPTK.ppd
+LBP3250	CNCUPSLBP3250CAPTK.ppd
+LBP3210	CNCUPSLBP3210CAPTK.ppd
+LBP3200	CNCUPSLBP3200CAPTK.ppd
+LBP3100 / LBP3108 / LBP3150	CNCUPSLBP3150CAPTK.ppd
+LBP3010 / LBP3018 / LBP3050	CNCUPSLBP3050CAPTK.ppd
+LBP3000	CNCUPSLBP3000CAPTK.ppd
+LBP2900	CNCUPSLBP2900CAPTK.ppd
+LBP-1210	CNCUPSLBP1210CAPTK.ppd
+LBP-1120	CNCUPSLBP1120CAPTK.ppd
+LBP-810	CNCUPSLBP1120CAPTK.ppd
+Пропишем демон ccpd в systemd. Для этого в файл /etc/systemd/system/ccpd.service необходимо занести следующее:
+[Unit]
+Description=CCPD Printing Daemon
+Requires=cups.service
+After=cups.service
+[Service]
+Type=forking
+ExecStart=/usr/sbin/ccpd
+TimeoutSec=5
+[Install]
+WantedBy=multi-user.target
+Удалим файл /etc/rc.d/init.d/ccpd
+sudo rm -f /etc/rc.d/init.d/ccpd
+Перезагрузим systemd с поиском новых или измененных юнитов:
+sudo systemctl daemon-reload
+Добавим службу ccpd в автозагрузку
+sudo systemctl enable ccpd
+Создадим правило для определения принтера. Для этого сперва выясним, как определится принтер в текущий момент: зайдите в папку /dev/usb и включите принтер. Появится новый файл /dev/usb/lp[НОМЕР].
+Выясним атрибут ATTRS{serial} нашего принтера. Для этого введите команду:
+udevadm info -a -p $(udevadm info -q path -n /dev/usb/lp[НОМЕР])
+где [НОМЕР] соответствует номеру файла /dev/usb/lp[НОМЕР], который мы увидели чуть ранее. Данная команда выведет на экран несколько столбцов. У интересующего нас столбца последняя строчка: "ATTRS{product}=="Canon CAPT USB Device"". Находим и копируем в этом столбце значение: ATTRS{serial}=="[нужное значение]"
+Создадим правило, которое обеспечит альтернативное имя (символическую ссылку) нашему принтеру, чтобы не зависеть от меняющихся значений lp0, lp1 и т.д. Для этого создадим файл /etc/udev/rules.d/85-canon-capt.rules со следующим содержимым (не забудьте подставить нужное значение ATTRS{serial}):
+KERNEL=="lp[0-9]*", SUBSYSTEMS=="usb", ATTRS{serial}=="[нужное значение]", SYMLINK+="canon"
+Обновим правила Udev:
+sudo udevadm control --reload-rules
+Выключаем и заново включаем принтер
+Обновляем ccpdadmin в соответствии с нашим правилом (не забудьте вместо LBP2900 указать Вашу модель принтера):
+sudo ccpdadmin -p LBP2900 -o /dev/canon
+Перезапустим службу ccpd:
+sudo systemctl restart ccpd
+Пробуем печать.
+
+Автоматическая установка (рекомендуется для начинающих пользователей)
+Пока не включаем принтер
+Скачиваем в домашнюю папку последнюю версию скрипта установки принтера:
+wget -O rosa_canon_lbp.sh 'https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1W63XWMSSQedLxhbTY-L1CnWu7jeUg6l5'
+Делаем скрипт исполняемым:
+chmod +x rosa_canon_lbp.sh
+Запускаем скрипт:
+./rosa_canon_lbp.sh
+Следуем дальнейшим указаниям скрипта
+Пробуем печать
