@@ -17,7 +17,7 @@
 2. sudo systemctl restart httpd.service
 
 ## install phpmyadmin
-sudo yum install epel-release
-sudo yum install phpmyadmin
-sudo nano /etc/httpd/conf.d/phpMyAdmin.conf - add permission
-sudo systemctl restart httpd.service
+1. sudo yum install epel-release
+2. sudo yum install phpmyadmin
+3. sudo nano /etc/httpd/conf.d/phpMyAdmin.conf - add permission
+4. sudo systemctl restart httpd.service
