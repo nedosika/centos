@@ -1,0 +1,35 @@
+## NextCloud install
+1. install LAMP server
+2. # yum install epel-release
+3. # rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+4. # yum install httpd php72w php72w-dom php72w-mbstring php72w-gd php72w-pdo php72w-json php72w-xml php72w-zip php72w-curl php72w-pear php72w-intl setroubleshoot-server bzip2 php72w-pecl-imagick
+5. yum install mariadb-server php72w-mysql
+6. mysql -u root -p
+7. CREATE DATABASE nextcloud;
+8. CREATE USER 'nc_user'@'localhost' IDENTIFIED BY 'YOUR_PASSWORD_HERE';
+9. GRANT ALL PRIVILEGES ON nextcloud.* TO 'nc_user'@'localhost';
+FLUSH PRIVILEGES;
+10. Install NextCloud:
+# cd /var/www/html
+# curl -o nextcloud-17-latest.tar.bz2 https://download.nextcloud.com/server/releases/latest-17.tar.bz2
+# tar -xvjf nextcloud-17-latest.tar.bz2
+# mkdir nextcloud/data
+# chown -R apache:apache nextcloud
+# rm nextcloud-17-latest.tar.bz2
+11. Configure Apache:
+Now we need to create a new file in /etc/httpd/conf.d/nextcloud.conf . 
+Feel free to use whatever editor you feel comfortable with and add the following lines:
+
+Alias /nextcloud "/var/www/html/nextcloud/"
+<Directory /var/www/html/nextcloud/>
+  Options +FollowSymlinks
+  AllowOverride All
+ <IfModule mod_dav.c>
+  Dav off
+ </IfModule>
+ SetEnv HOME /var/www/html/nextcloud
+ SetEnv HTTP_HOME /var/www/html/nextcloud
+</Directory>
+12. Install
+Once you’re done, it’s time to install everything. 
+Head to http://YOUR_IP_ADDRESS/nextcloud
