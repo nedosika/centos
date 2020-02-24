@@ -1,0 +1,24 @@
+1. yum install samba samba-client samba-common
+
+2. /etc/samba/smb.conf
+[global]
+workgroup = HOME
+server string = Samba Server %v
+netbios name = centos
+security = user
+map to guest = bad user
+dns proxy = no
+
+[Anonymous]
+path = /samba/anonymous
+browsable =yes
+writable = yes
+guest ok = yes
+read only = no
+
+3. 
+mkdir -p /samba/anonymous
+systemctl enable smb.service
+systemctl enable nmb.service
+systemctl restart smb.service
+systemctl restart nmb.service
