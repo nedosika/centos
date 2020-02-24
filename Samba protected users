@@ -1,0 +1,20 @@
+1. groupadd smbgrp
+2. useradd dve -G smbgrp
+3. smbpasswd -a dve
+
+4.mkdir -p /samba/secured
+5.cd /samba && chmod -R 777 secured/
+
+6. 
+[secured]
+path = /samba/secured
+valid users = @smbgrp
+guest ok = no
+writable = yes
+browsable = yes
+
+7. 
+systemctl restart smb.service
+systemctl restart nmb.service
+
+8. chown -R dve:smbgrp secured//
