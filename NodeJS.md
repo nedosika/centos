@@ -4,18 +4,13 @@ To gain access to the EPEL repo, you must modify the repo-list of your installat
 
 1. sudo yum install epel-release
 
-Now that you have access to the EPEL repository, you can install Node.js using your regular yum commands:
+2.
+For Latest Release:-
+yum install -y gcc-c++ make
+curl -sL https://rpm.nodesource.com/setup_13.x | sudo -E bash -
 
-2. sudo yum install nodejs
+For Stable Release:-
+yum install -y gcc-c++ make
+curl -sL https://rpm.nodesource.com/setup_12.x | sudo -E bash -
 
-Once again, you can check that the installation was successful by asking Node to return its version number:
-
-node --version
-v0.10.30
-
-
-Many people will also want access to npm to manage their Node packages. You can also get this from EPEL by typing:
-
-3. sudo yum install npm
-
-https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-a-centos-7-server
+3. yum install nodejs
